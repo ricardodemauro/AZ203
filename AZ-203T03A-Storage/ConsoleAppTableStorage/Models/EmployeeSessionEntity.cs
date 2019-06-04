@@ -17,8 +17,8 @@ namespace ConsoleAppTableStorage.Models
             Id = id;
             Name = name;
             Salaray = sal;
-            PartitionKey = id.ToString();
-            RowKey = name;
+            PartitionKey = name;
+            RowKey = Guid.NewGuid().ToString();
         }
         public int Id { get; set; }
         public string Name { get; set; }
