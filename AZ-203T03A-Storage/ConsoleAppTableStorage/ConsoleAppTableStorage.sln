@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28922.388
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppTableStorage", "ConsoleAppTableStorage.csproj", "{7DC535ED-FC99-45B8-A3FF-4C9882AE5667}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DC535ED-FC99-45B8-A3FF-4C9882AE5667}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DC535ED-FC99-45B8-A3FF-4C9882AE5667}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DC535ED-FC99-45B8-A3FF-4C9882AE5667}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DC535ED-FC99-45B8-A3FF-4C9882AE5667}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5E102110-6729-425F-BD04-7C720CD6FA7A}
+	EndGlobalSection
+EndGlobal
