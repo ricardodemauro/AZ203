@@ -13,7 +13,7 @@ namespace ConsoleAppTableStorage
 {
     public class TableManager
     {
-        const string _connectionString = @"DefaultEndpointsProtocol=https;AccountName=myamazingstorageaccount;AccountKey=bPbzZJAPBFZ3kueL85251gs0rzTscYVFMdr4V8DDwNOXmM5pOu3sd8Vd/RdYhsqUTFjCAr3qUrMr7BZfBn2TyQ==;EndpointSuffix=core.windows.net";
+        const string _connectionString = @"DefaultEndpointsProtocol=https;AccountName=myotheramazingcosmodbtable;AccountKey=lnzkTYqlmdeICCCYihQKchFhwFYYkUdBv2qKfX7KcZANX0RcfM1vYL3NjrikX4VeRuKmWL9ma9J3jRS2zaCczw==;TableEndpoint=https://myotheramazingcosmodbtable.table.cosmos.azure.com:443";
 
         // private property  
         private CloudTable _table;
