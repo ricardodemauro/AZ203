@@ -1,0 +1,74 @@
+﻿<Window x:Class="WpfApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid x:Name="LayoutRoot">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="VisualStateGroup">
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+
+            <Grid x:Name="ContentGrid" Margin="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!--TitleGrid contains the name of the application and page title-->
+                <Grid x:Name="TitleGrid" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Foreground="#0094ff" FontFamily="Segoe UI Light" Margin="0,0,0,6">AZURE APP SERVICE</TextBlock>
+                        <TextBlock x:Name="TitleTextBlock" Foreground="Gray" FontFamily="Segoe UI Light" FontSize="20" >Try Mobile Apps</TextBlock>
+                    </StackPanel>
+                </Grid>
+
+
+                <StackPanel Grid.Row="2" Grid.Column="0">
+                    <Button x:Name="ButtonRefresh" Content="Refresh"></Button>
+
+                    <TextBox Height="23" TextWrapping="Wrap" x:Name="TextInput"/>
+                    <Button x:Name="ButtonSave" Content="Save"></Button>
+                </StackPanel>
+
+
+                <Grid x:Name="ItemsGrid" Grid.Row="2" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="500"/>
+                    </Grid.RowDefinitions>
+
+                    <ScrollViewer Grid.Row="1" Margin="0,10,0,0" 
+                                  VerticalScrollBarVisibility="Visible" 
+                                  VerticalAlignment="Stretch" 
+                                  HorizontalAlignment="Stretch">
+                        <ListView x:Name="ListItems">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox x:Name="CheckBoxComplete" 
+                                              IsChecked="{Binding Complete, Mode=TwoWay}" 
+                                              Checked="CheckBoxComplete_Checked" 
+                                              MaxWidth="550"
+                                              VerticalAlignment="Center">
+                                        <TextBlock Name="ItemText" Text="{Binding Text}" MaxWidth="550" HorizontalAlignment="Left" />
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </ScrollViewer>
+
+
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
