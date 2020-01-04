@@ -141,7 +141,7 @@ namespace CreateAzureVM
 
         static async Task<IResourceGroup> CreateResources(string name, Region region = null, CancellationToken cancellationToken = default)
         {
-            Console.WriteLine("Creating resource group... with name");
+            Console.WriteLine($"Creating resource group... with name {name}");
 
             bool exists = await Subscription.ResourceGroups.ContainAsync(name, cancellationToken);
             if (exists)
@@ -161,7 +161,7 @@ namespace CreateAzureVM
             return await Subscription.AvailabilitySets.Define(name)
                 .WithRegion(resourceGroup.Region)
                 .WithExistingResourceGroup(resourceGroup)
-                .WithSku(AvailabilitySetSkuTypes.Managed)
+                .WithSku(AvailabilitySetSkuTypes.Aligned)
                 .CreateAsync();
         }
 
