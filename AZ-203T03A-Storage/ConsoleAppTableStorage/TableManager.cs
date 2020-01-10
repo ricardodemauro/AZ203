@@ -13,16 +13,8 @@ namespace ConsoleAppTableStorage
 {
     public class TableManager
     {
-        const string _connectionString = @"DefaultEndpointsProtocol=https;AccountName=myotheramazingcosmodbtable;AccountKey=lnzkTYqlmdeICCCYihQKchFhwFYYkUdBv2qKfX7KcZANX0RcfM1vYL3NjrikX4VeRuKmWL9ma9J3jRS2zaCczw==;TableEndpoint=https://myotheramazingcosmodbtable.table.cosmos.azure.com:443";
-
         // private property  
         private CloudTable _table;
-
-        public TableManager(string tableName)
-            : this(tableName, _connectionString)
-        {
-
-        }
 
         public TableManager(string tableName, string connectionString)
         {
@@ -35,7 +27,8 @@ namespace ConsoleAppTableStorage
 
             CloudTable table = client.GetTableReference(tableName);
 
-            table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            table.CreateIfNotExistsAsync()
+                .GetAwaiter().GetResult();
 
             _table = table;
         }

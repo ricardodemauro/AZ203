@@ -1,4 +1,5 @@
 ﻿using ConsoleAppTableStorage.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 
@@ -6,9 +7,20 @@ namespace ConsoleAppTableStorage
 {
     class Program
     {
+        static readonly IConfiguration configuration;
+
+        static Program()
+        {
+            configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false)
+                .AddUserSecrets("ccaae0ba-923f-4824-9c39-a91f16045934")
+                .Build();
+        }
+
         static async Task Main(string[] args)
         {
-            TableManager manager = new TableManager("customers");
+            string connectionString = configuration["AzureStorageConnectionString"];
+            TableManager manager = new TableManager("customers", connectionString);
 
             await manager.Add(new EmployeeSessionEntity(1, "ricardo", 29992));
             await manager.Add(new EmployeeSessionEntity(1, "ricardo2", 29992));
