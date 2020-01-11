@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using System;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace ConsoleAppSQLData
 {
@@ -15,8 +16,11 @@ namespace ConsoleAppSQLData
         static Program()
         {
             configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false)
                 .Build();
+
+            Console.WriteLine($"Conn {configuration.GetConnectionString("Default")}");
 
             var coll = new ServiceCollection();
 
