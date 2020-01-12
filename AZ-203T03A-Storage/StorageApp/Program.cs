@@ -2,6 +2,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,10 +19,11 @@ namespace StorageApp
     {
         const int LIST_FILES = 1;
         const int UPLOAD_FILE = 2;
-        const int DOWNLOAD_FILE = 3;
-        const int SAS_KEY = 4;
-        const int SHOW_CONNECTION_STRING = 5;
-        const int EXIT = 6;
+        const int UPLOAD_IMAGE_WITH_CONTENT_TYPE = 3;
+        const int DOWNLOAD_FILE = 4;
+        const int SAS_KEY = 5;
+        const int SHOW_CONNECTION_STRING = 6;
+        const int EXIT = 7;
 
         static readonly string _connectionString;
         static readonly string _accountName;
@@ -91,6 +93,9 @@ namespace StorageApp
                 case UPLOAD_FILE:
                     await app.Upload();
                     break;
+                case UPLOAD_IMAGE_WITH_CONTENT_TYPE:
+                    await app.UploadImage();
+                    break;
                 case SHOW_CONNECTION_STRING:
                     Console.WriteLine(_connectionString);
                     break;
@@ -104,6 +109,7 @@ namespace StorageApp
             Console.WriteLine($"{Environment.NewLine}{Environment.NewLine}Available options...");
             Console.WriteLine($"{LIST_FILES}. List files");
             Console.WriteLine($"{UPLOAD_FILE}. Upload file");
+            Console.WriteLine($"{UPLOAD_IMAGE_WITH_CONTENT_TYPE}. Upload image with mime type");
             Console.WriteLine($"{DOWNLOAD_FILE}. Download file");
             Console.WriteLine($"{SAS_KEY}. Generate SAS Key");
             Console.WriteLine($"{SHOW_CONNECTION_STRING}. Show connection string");
@@ -120,7 +126,16 @@ namespace StorageApp
         private readonly ILogger<App> _logger;
 
         private const string CONTAINER_NAME = "quickstartblobs";
+
+        /// <summary>
+        /// sample.txt
+        /// </summary>
         private const string FILE_NAME = "sample.txt";
+
+        /// <summary>
+        /// sample.png
+        /// </summary>
+        private const string FILE_NAME_IMG = "sample.png";
 
         public App(string connectionString, string accountKey, string accountName, ILogger<App> logger)
         {
@@ -144,7 +159,7 @@ namespace StorageApp
 
         public async Task Upload()
         {
-            string localFilePath = Path.Combine(Directory.GetCurrentDirectory(), "sample.txt");
+            string localFilePath = Path.Combine(Directory.GetCurrentDirectory(), FILE_NAME);
 
             var containerClient = await GetContainer();
 
@@ -222,6 +237,29 @@ namespace StorageApp
             };
 
             _logger.LogInformation($"Uri with SAS Token {fullUri.ToString()}");
+        }
+
+        public async Task UploadImage()
+        {
+            string localFilePath = Path.Combine(Directory.GetCurrentDirectory(), FILE_NAME_IMG);
+
+            var containerClient = await GetContainer();
+
+            // Get a reference to a blob
+            BlobClient blobClient = containerClient.GetBlobClient($"{Guid.NewGuid().ToString()}-{FILE_NAME_IMG}");
+
+            _logger.LogInformation("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
+
+            var pvd = new FileExtensionContentTypeProvider();
+            bool isKnownType = pvd.TryGetContentType(FILE_NAME_IMG, out string mimeType);
+
+            // Open the file and upload its data
+            using FileStream uploadFileStream = File.OpenRead(localFilePath);
+            await blobClient.UploadAsync(uploadFileStream, new BlobHttpHeaders()
+            {
+                ContentType = mimeType
+            });
+            uploadFileStream.Close();
         }
     }
 }
