@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebAppFaces.Insfrastructure;
 
 namespace WebAppFaces
 {
@@ -23,6 +24,14 @@ namespace WebAppFaces
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
+
+            services.Configure<ApiOptions>(opts =>
+            {
+                opts.ApiKey = Configuration["Api:ApiKey"];
+                opts.ApiUrl = Configuration["Api:ApiUrl"];
+            });
+
             services.AddRazorPages();
         }
 

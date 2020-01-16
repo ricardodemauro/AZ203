@@ -35,6 +35,11 @@ namespace FaceAPI.Controllers
             return container;
         }
 
+        //generate SAS Keys
+        void SAS()
+        {
+        }
+
         [HttpGet()]
         public async Task<ActionResult<IEnumerable<string>>> Index()
         {
