@@ -2,5 +2,53 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "subscriptions_5e250fee11210e006b070001_displayName": {
+      "value": null
+    },
+    "subscriptions_5e250fee11210e006b070002_displayName": {
+      "value": null
+    },
+    "users_1_lastName": {
+      "value": null
+    },
+    "sites_poli_instrutor_name": {
+      "value": null
+    },
+    "components_poli_AI_name": {
+      "value": null
+    },
+    "vaults_kv_instrutor_name": {
+      "value": null
+    },
+    "sites_poli_api_instrutor_name": {
+      "value": null
+    },
+    "sites_poli_events_instrutor_name": {
+      "value": null
+    },
+    "serverfarms_Poli_ServicePlan_name": {
+      "value": null
+    },
+    "sites_FaceDetectionV3_instrutor_name": {
+      "value": null
+    },
+    "storageAccounts_poliinstrutor_name": {
+      "value": null
+    },
+    "accounts_face_instrutor_name": {
+      "value": null
+    },
+    "service_api_management_instrutor_name": {
+      "value": null
+    },
+    "profiles_poli_instrutor_name": {
+      "value": null
+    },
+    "smartdetectoralertrules_failure_anomalies___poli_ai_name": {
+      "value": null
+    },
+    "actiongroups_application_20insights_20smart_20detection_externalid": {
+      "value": null
+    }
   }
 }
