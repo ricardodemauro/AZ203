@@ -3,6 +3,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using FaceAPI.Infrastructure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
@@ -17,6 +18,8 @@ using System.Threading.Tasks;
 
 namespace FaceAPI.Controllers
 {
+    [Route("[controller]")]
+    [ApiController()]
     public class ImagesController : Controller
     {
         private readonly StorageOptions _options;
@@ -88,19 +91,39 @@ namespace FaceAPI.Controllers
             return fullUri.ToString();
         }
 
+        /// <summary>
+        /// Get list of files
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Route("")]
         [HttpGet()]
         public async Task<ActionResult<IEnumerable<string>>> Index()
         {
             return Ok(await GetFilesFromContainer(_options.FullImageContainerName));
         }
 
+        /// <summary>
+        /// Get list of thumb files
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
+        [Route("thumbs")]
         public async Task<ActionResult<IEnumerable<string>>> Thumbs()
         {
             return Ok(await GetFilesFromContainer(_options.ThumbnailImageContainerName));
         }
 
+        /// <summary>
+        /// Creates a document
+        /// </summary>
+        /// <param name="filename">filename with extension</param>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost()]
+        [Route("")]
         public async Task<ActionResult> Create(string filename = null)
         {
             Stream image = Request.Body;

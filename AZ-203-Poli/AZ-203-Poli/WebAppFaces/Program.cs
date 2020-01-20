@@ -20,7 +20,8 @@ namespace WebAppFaces
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging((ctx, builder) =>
                 {
-                    builder.AddApplicationInsights(ctx.Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+                    if (!string.IsNullOrEmpty(ctx.Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]))
+                        builder.AddApplicationInsights(ctx.Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
