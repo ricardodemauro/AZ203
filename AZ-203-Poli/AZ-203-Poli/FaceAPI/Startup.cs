@@ -17,12 +17,9 @@ namespace FaceAPI
     {
         private readonly IConfiguration configuration;
 
-        private readonly IWebHostEnvironment hostingEnvironment;
-
-        public Startup(IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
+        public Startup(IConfiguration configuration)
         {
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         }
 
 
@@ -30,6 +27,9 @@ namespace FaceAPI
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            // The following line enables Application Insights telemetry collection.
+            services.AddApplicationInsightsTelemetry();
+
             services.AddOptions();
 
             services.Configure<StorageOptions>(x =>
@@ -37,6 +37,11 @@ namespace FaceAPI
                 x.FullImageContainerName = configuration["Storage:FullImageContainerName"];
                 x.StorageConnectionString = configuration["Storage:StorageConnectionString"];
                 x.ThumbnailImageContainerName = configuration["Storage:ThumbnailImageContainerName"];
+                x.BaseUrl = configuration["Storage:BaseUrl"];
+
+                string[] connSplited = x.StorageConnectionString.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                x.AccountKey = connSplited[2].Replace("AccountKey=", "");
+                x.AccountName = connSplited[1].Replace("AccountName=", "");
             });
 
             services.AddMvc();
@@ -50,6 +55,8 @@ namespace FaceAPI
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
@@ -57,7 +64,7 @@ namespace FaceAPI
                 endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapFallback(async context =>
                 {
-                    await context.Response.WriteAsync("fallback endpoint");
+                    await context.Response.WriteAsync("nothing to see here...");
                 });
             });
         }

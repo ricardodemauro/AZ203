@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebAppFaces.Insfrastructure;
+using WebAppFaces.Pages;
 
 namespace WebAppFaces
 {
@@ -24,6 +25,9 @@ namespace WebAppFaces
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // The following line enables Application Insights telemetry collection.
+            services.AddApplicationInsightsTelemetry();
+
             services.AddOptions();
 
             services.Configure<ApiOptions>(opts =>
@@ -31,6 +35,8 @@ namespace WebAppFaces
                 opts.ApiKey = Configuration["Api:ApiKey"];
                 opts.ApiUrl = Configuration["Api:ApiUrl"];
             });
+
+            services.AddHttpClient();
 
             services.AddRazorPages();
         }

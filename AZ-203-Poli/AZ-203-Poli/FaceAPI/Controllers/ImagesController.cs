@@ -1,15 +1,17 @@
-﻿using System;
+﻿using Azure.Storage;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
+using FaceAPI.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using FaceAPI.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -26,73 +28,102 @@ namespace FaceAPI.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async ValueTask<CloudBlobContainer> GetCloudBlobContainer(string containerName)
+        private async ValueTask<BlobContainerClient> GetCloudBlobContainer(string containerName)
         {
-            CloudStorageAccount account = CloudStorageAccount.Parse(_options.StorageConnectionString);
-            CloudBlobClient blobClient = account.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
-            await container.CreateIfNotExistsAsync();
-            return container;
+            _logger.LogInformation("Getting Container Reference for {container}", containerName);
+
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_options.StorageConnectionString);
+
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
+
+            return containerClient;
+        }
+
+        private async Task<IEnumerable<string>> GetFilesFromContainer(string containerName)
+        {
+            var container = await GetCloudBlobContainer(containerName);
+
+            List<BlobItem> results = new List<BlobItem>();
+
+            await foreach (BlobItem item in container.GetBlobsAsync())
+            {
+                results.Add(item);
+            }
+
+            _logger.LogInformation("Got Images from {container}", containerName);
+
+            return results.Select(blob => $"{_options.BaseUrl}/{containerName}/{blob.Name}");
         }
 
         //generate SAS Keys
-        void SAS()
+        private string UrlWithSAS(string filename, string containerName)
         {
+            var builder = new BlobSasBuilder
+            {
+                BlobContainerName = containerName,
+                StartsOn = DateTime.UtcNow,
+                ExpiresOn = DateTime.UtcNow.AddMinutes(4),
+                BlobName = filename
+            };
+
+            builder.SetPermissions(BlobAccountSasPermissions.Read);
+
+            //  Builds an instance of StorageSharedKeyCredential      
+            var storageSharedKeyCredential = new StorageSharedKeyCredential(_options.AccountName, _options.AccountKey);
+
+            var sasQueryParameters = builder.ToSasQueryParameters(storageSharedKeyCredential);
+
+            //  Builds the URI to the blob storage.
+            UriBuilder fullUri = new UriBuilder()
+            {
+                Scheme = "https",
+                Host = string.Format("{0}.blob.core.windows.net", _options.AccountName),
+                Path = string.Format("{0}/{1}", containerName, filename),
+                Query = sasQueryParameters.ToString()
+            };
+
+            _logger.LogInformation("Uri with SAS Token generated for {filename} and {container}", filename, containerName);
+
+            return fullUri.ToString();
         }
 
         [HttpGet()]
         public async Task<ActionResult<IEnumerable<string>>> Index()
         {
-            CloudBlobContainer container = await GetCloudBlobContainer(_options.FullImageContainerName);
-            BlobContinuationToken continuationToken = null;
-
-            List<IListBlobItem> results = new List<IListBlobItem>();
-            do
-            {
-                var response = await container.ListBlobsSegmentedAsync(continuationToken);
-                continuationToken = response.ContinuationToken;
-                results.AddRange(response.Results);
-            }
-            while (continuationToken != null);
-
-            _logger.LogInformation("Got Images");
-
-            return Ok(results.Select(blob => blob.Uri.AbsoluteUri));
+            return Ok(await GetFilesFromContainer(_options.FullImageContainerName));
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<string>>> Thumbs()
         {
-            CloudBlobContainer container = await GetCloudBlobContainer(_options.ThumbnailImageContainerName);
-            BlobContinuationToken continuationToken = null;
-
-            List<IListBlobItem> results = new List<IListBlobItem>();
-            do
-            {
-                var response = await container.ListBlobsSegmentedAsync(continuationToken);
-                continuationToken = response.ContinuationToken;
-                results.AddRange(response.Results);
-            }
-            while (continuationToken != null);
-
-            _logger.LogInformation("Got Thumbs");
-
-            return Ok(results.Select(blob => blob.Uri.AbsoluteUri));
+            return Ok(await GetFilesFromContainer(_options.ThumbnailImageContainerName));
         }
 
-        [Route("")]
-        [HttpPost]
-        public async Task<ActionResult> Create()
+        [HttpPost()]
+        public async Task<ActionResult> Create(string filename = null)
         {
             Stream image = Request.Body;
 
-            CloudBlobContainer container = await GetCloudBlobContainer(_options.FullImageContainerName);
-            string blobName = Guid.NewGuid().ToString().ToLower().Replace("-", String.Empty);
+            string blobName = filename ?? $"{Guid.NewGuid().ToString().ToLower().Replace("-", string.Empty)}.png";
 
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
-            await blockBlob.UploadFromStreamAsync(image);
+            var containerClient = await GetCloudBlobContainer(_options.FullImageContainerName);
 
-            return Created(blockBlob.Uri, null);
+            // Get a reference to a blob
+            BlobClient blobClient = containerClient.GetBlobClient(blobName);
+
+            _logger.LogInformation("Uploading to Blob storage as blob: {uri}", blobClient.Uri);
+
+            var pvd = new FileExtensionContentTypeProvider();
+            _ = pvd.TryGetContentType(blobName, out string mimeType);
+
+            // Open the file and upload its data
+            await blobClient.UploadAsync(image, new BlobHttpHeaders()
+            {
+                ContentType = mimeType
+            });
+
+            return Created(blobClient.Name, null);
         }
     }
 }

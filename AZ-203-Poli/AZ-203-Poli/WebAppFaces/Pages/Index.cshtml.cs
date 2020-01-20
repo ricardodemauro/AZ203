@@ -16,16 +16,16 @@ namespace WebAppFaces.Pages
 {
     public class IndexModel : PageModel
     {
-        private HttpClient _httpClient;
-        private ApiOptions _options;
+        private readonly IHttpClientFactory _httpFactory;
+        private readonly ApiOptions _options;
 
         public List<string> ThumbnailImageList { get; private set; }
 
         public List<string> FullImageList { get; private set; }
 
-        public IndexModel(HttpClient httpClient, IOptions<ApiOptions> options)
+        public IndexModel(IHttpClientFactory httpFactory, IOptions<ApiOptions> options)
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _httpFactory = httpFactory ?? throw new ArgumentNullException(nameof(httpFactory));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
@@ -34,19 +34,21 @@ namespace WebAppFaces.Pages
             var baseUrl = _options.ApiUrl;
 
             var imagesUrl = Flurl.Url.Combine(baseUrl, "/images/");
-            var thumbsUrl = Flurl.Url.Combine(baseUrl, "/thumbs/");
+            var thumbsUrl = Flurl.Url.Combine(baseUrl, "/images/thumbs/");
 
-            Task<string> getFullImages = _httpClient.GetStringAsync(imagesUrl);
-            Task<string> getThumbnailImages = _httpClient.GetStringAsync(thumbsUrl);
+            using var client = _httpFactory.CreateClient();
+            Task<string> getFullImages = client.GetStringAsync(imagesUrl);
+            Task<string> getThumbnailImages = client.GetStringAsync(thumbsUrl);
+
             await Task.WhenAll(getFullImages);
 
             string fullImagesJson = getFullImages.Result;
             IEnumerable<string> fullImagesList = JsonConvert.DeserializeObject<IEnumerable<string>>(fullImagesJson);
-            this.FullImageList = fullImagesList.ToList<string>();
+            FullImageList = fullImagesList.ToList<string>();
 
             string thumbImagesJson = getThumbnailImages.Result;
             IEnumerable<string> thumbImagesList = JsonConvert.DeserializeObject<IEnumerable<string>>(thumbImagesJson);
-            this.ThumbnailImageList = thumbImagesList.ToList<string>();
+            ThumbnailImageList = thumbImagesList.ToList<string>();
         }
 
 
@@ -58,13 +60,15 @@ namespace WebAppFaces.Pages
             if (Upload != null && Upload.Length > 0)
             {
                 var baseUrl = _options.ApiUrl;
-                var imagesUrl = Flurl.Url.Combine(baseUrl, "/images/");
+                var imagesUrl = Flurl.Url.Combine(baseUrl, $"/images/create/?filename={Upload.FileName}");
 
-                using (var image = new StreamContent(Upload.OpenReadStream()))
-                {
-                    image.Headers.ContentType = new MediaTypeHeaderValue(Upload.ContentType);
-                    var response = await _httpClient.PostAsync(imagesUrl, image);
-                }
+                using var image = new StreamContent(Upload.OpenReadStream());
+                image.Headers.ContentType = new MediaTypeHeaderValue(Upload.ContentType);
+                
+                using var httpClient = _httpFactory.CreateClient();
+                var response = await httpClient.PostAsync(imagesUrl, image);
+
+                response.EnsureSuccessStatusCode();
             }
             return RedirectToPage("/Index");
         }

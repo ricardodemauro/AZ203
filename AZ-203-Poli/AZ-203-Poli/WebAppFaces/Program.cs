@@ -18,6 +18,10 @@ namespace WebAppFaces
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureLogging((ctx, builder) =>
+                {
+                    builder.AddApplicationInsights(ctx.Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

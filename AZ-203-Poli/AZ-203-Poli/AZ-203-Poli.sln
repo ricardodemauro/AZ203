@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FaceDetectionV3", "FaceDetectionV3\FaceDetectionV3.csproj", "{47117289-F57B-4A45-9902-419DE41FE935}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FaceDetectionV3", "FaceDetectionV3\FaceDetectionV3.csproj", "{47117289-F57B-4A45-9902-419DE41FE935}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FaceAPI", "FaceAPI\FaceAPI.csproj", "{F9388D10-C9BF-43EE-BF13-6F0D429215CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FaceAPI", "FaceAPI\FaceAPI.csproj", "{F9388D10-C9BF-43EE-BF13-6F0D429215CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppFaces", "WebAppFaces\WebAppFaces.csproj", "{39FAB80D-6772-4878-95C7-20556C2366BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppFaces", "WebAppFaces\WebAppFaces.csproj", "{39FAB80D-6772-4878-95C7-20556C2366BD}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Poli.AzureResourceGroup", "Poli.AzureResourceGroup\Poli.AzureResourceGroup.deployproj", "{E9056C49-54F1-41D2-9077-5E57021AC492}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{39FAB80D-6772-4878-95C7-20556C2366BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39FAB80D-6772-4878-95C7-20556C2366BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39FAB80D-6772-4878-95C7-20556C2366BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9056C49-54F1-41D2-9077-5E57021AC492}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9056C49-54F1-41D2-9077-5E57021AC492}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9056C49-54F1-41D2-9077-5E57021AC492}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9056C49-54F1-41D2-9077-5E57021AC492}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
