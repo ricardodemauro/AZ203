@@ -20,12 +20,6 @@ namespace FaceDetectionV3
                 opt.FaceEndpoint = Environment.GetEnvironmentVariable("FACE_ENDPOINT");
             });
 
-            builder.Services.Configure<StorageOptions>(opt =>
-            {
-                opt.ContainerName = Environment.GetEnvironmentVariable("ContainerName");
-                opt.StorageAccountName = Environment.GetEnvironmentVariable("StorageAccountName");
-            });
-
             builder.Services.AddScoped<FaceApp>();
         }
     }
